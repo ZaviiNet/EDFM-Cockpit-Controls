@@ -18,7 +18,7 @@ Live Demo
 
 ## 🛠️ How to use
 
-**Open the website. [here](https://#)**
+**Open the website. [here](https://cockpitcontrols.edfm.space)**
 
 The "Default" profile loads automatically.
 
