@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Dangerous Keybind Visualizer</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #0a0a0a;
+        }
+        /* Custom scrollbar for the list */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 113, 0, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #ff7100;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #ff8c00;
+        }
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useCallback } = React;
+
+        // --- Icons ---
+        const Icon = ({ children, size = 24, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
+        );
+
+        const Upload = (props) => <Icon {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></Icon>;
+        const Download = (props) => <Icon {...props}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Icon>;
+        const Search = (props) => <Icon {...props}><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></Icon>;
+        const Rocket = (props) => <Icon {...props}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></Icon>;
+        const Gamepad = (props) => <Icon {...props}><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="2"/></Icon>;
+        const KeyboardIcon = (props) => <Icon {...props}><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M6 12h.001"/><path d="M10 12h.001"/><path d="M14 12h.001"/><path d="M18 12h.001"/><path d="M7 16h10"/></Icon>;
+        const ChevronDown = (props) => <Icon {...props}><polyline points="6 9 12 15 18 9"/></Icon>;
+        const FileText = (props) => <Icon {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></Icon>;
+        const Edit2 = (props) => <Icon {...props}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></Icon>;
+        const X = (props) => <Icon {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></Icon>;
+        const Save = (props) => <Icon {...props}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></Icon>;
+
+        // --- Styles ---
+        const styles = {
+            container: `min-h-screen bg-black text-[#ff7100] font-mono selection:bg-[#ff7100] selection:text-black overflow-x-hidden`,
+            header: `border-b border-[#ff7100] p-4 flex justify-between items-center bg-[rgba(20,20,20,0.9)] sticky top-0 z-50 shadow-[0_0_15px_rgba(255,113,0,0.3)]`,
+            title: `text-2xl font-bold tracking-wider uppercase flex items-center gap-2`,
+            panel: `border border-[#ff7100] bg-[rgba(10,10,10,0.8)] rounded-sm relative overflow-hidden`,
+            panelHeader: `bg-[#ff7100] text-black px-4 py-1 font-bold text-sm uppercase flex justify-between items-center`,
+            key: `relative h-12 flex items-center justify-center border border-[#ff7100] rounded-sm text-xs font-bold transition-all duration-100 cursor-pointer hover:shadow-[0_0_10px_#ff7100] select-none`,
+            keyActive: `bg-[#ff7100] text-black shadow-[0_0_15px_#ff7100]`,
+            keyEmpty: `opacity-50 border-[#666] text-[#666] hover:border-[#ff7100] hover:text-[#ff7100] hover:opacity-100`,
+            scanline: `pointer-events-none fixed inset-0 w-full h-full bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] z-[60] opacity-20`,
+        };
+
+        // --- Utils ---
+        const formatActionName = (name) => name.replace(/([A-Z])/g, ' $1').trim().replace(/_/g, ' ');
+
+        const parseXMLBinds = (xmlText) => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            const root = xmlDoc.getElementsByTagName("Root")[0];
+            if (!root) return [];
+            const binds = [];
+            for (let i = 0; i < root.children.length; i++) {
+                const node = root.children[i];
+                const actionName = node.tagName;
+                if (['KeyboardLayout', 'MouseXMode', 'MouseYMode'].includes(actionName)) continue;
+
+                const extract = (elem) => {
+                    if (!elem) return null;
+                    const device = elem.getAttribute("Device");
+                    const key = elem.getAttribute("Key");
+                    if (!device || device === "{NoDevice}") return null;
+                    return { device, key }; // simplified for now
+                };
+
+                const pBind = extract(node.getElementsByTagName("Primary")[0]);
+                const sBind = extract(node.getElementsByTagName("Secondary")[0]);
+                const aBind = extract(node.getElementsByTagName("Binding")[0]);
+
+                if (pBind || sBind || aBind) {
+                    binds.push({ action: actionName, primary: pBind, secondary: sBind, axis: aBind });
+                }
+            }
+            return binds;
+        };
+
+        const mapToEliteKey = (code) => {
+            // Mapping JS Key codes to Elite Dangerous XML format
+            const map = {
+                'Escape': 'Key_Escape', 'Space': 'Key_Space', 'Enter': 'Key_Enter', 'Backspace': 'Key_Backspace',
+                'Tab': 'Key_Tab', 'CapsLock': 'Key_CapsLock', 'ShiftLeft': 'Key_LeftShift', 'ShiftRight': 'Key_RightShift',
+                'ControlLeft': 'Key_LeftControl', 'ControlRight': 'Key_RightControl', 'AltLeft': 'Key_LeftAlt', 'AltRight': 'Key_RightAlt',
+                'ArrowUp': 'Key_UpArrow', 'ArrowDown': 'Key_DownArrow', 'ArrowLeft': 'Key_LeftArrow', 'ArrowRight': 'Key_RightArrow',
+                'Minus': 'Key_Minus', 'Equal': 'Key_Equals', 'BracketLeft': 'Key_LBracket', 'BracketRight': 'Key_RBracket',
+                'Semicolon': 'Key_SemiColon', 'Quote': 'Key_Apostrophe', 'Backslash': 'Key_Backslash', 'Comma': 'Key_Comma',
+                'Period': 'Key_Period', 'Slash': 'Key_Slash', 'Backquote': 'Key_Grave',
+                'Numpad0': 'Key_Numpad_0', 'Numpad1': 'Key_Numpad_1', 'Numpad2': 'Key_Numpad_2', 'Numpad3': 'Key_Numpad_3',
+                'Numpad4': 'Key_Numpad_4', 'Numpad5': 'Key_Numpad_5', 'Numpad6': 'Key_Numpad_6', 'Numpad7': 'Key_Numpad_7',
+                'Numpad8': 'Key_Numpad_8', 'Numpad9': 'Key_Numpad_9', 'NumpadSubtract': 'Key_Numpad_Subtract',
+                'NumpadAdd': 'Key_Numpad_Add', 'NumpadEnter': 'Key_Numpad_Enter', 'NumpadDivide': 'Key_Numpad_Divide', 'NumpadMultiply': 'Key_Numpad_Multiply'
+            };
+            if (map[code]) return map[code];
+            if (code.startsWith('Key')) return `Key_${code.slice(3)}`;
+            if (code.startsWith('Digit')) return `Key_${code.slice(5)}`;
+            if (code.startsWith('F') && code.length <= 3) return `Key_${code}`;
+            return `Key_${code}`; // Fallback
+        };
+
+        const generateXML = (binds) => {
+            let xml = `<?xml version="1.0" encoding="UTF-8" ?>\n<Root PresetName="Custom" MajorVersion="4" MinorVersion="2">\n\t<KeyboardLayout>en-GB</KeyboardLayout>\n`;
+
+            binds.forEach(b => {
+                xml += `\t<${b.action}>\n`;
+                if (b.axis) {
+                    xml += `\t\t<Binding Device="${b.axis.device}" Key="${b.axis.key}" />\n`;
+                    xml += `\t\t<Inverted Value="0" />\n\t\t<Deadzone Value="0.00000000" />\n`;
+                } else {
+                    // Primary
+                    if (b.primary) xml += `\t\t<Primary Device="${b.primary.device}" Key="${b.primary.key}" />\n`;
+                    else xml += `\t\t<Primary Device="{NoDevice}" Key="" />\n`;
+
+                    // Secondary
+                    if (b.secondary) xml += `\t\t<Secondary Device="${b.secondary.device}" Key="${b.secondary.key}" />\n`;
+                    else xml += `\t\t<Secondary Device="{NoDevice}" Key="" />\n`;
+                }
+                xml += `\t</${b.action}>\n`;
+            });
+
+            xml += `</Root>`;
+            return xml;
+        };
+
+        // --- Keyboard Layout ---
+        const KEYBOARD_LAYOUT = [
+            [{ code: 'Key_Escape', label: 'ESC', w: 1 }, { code: 'Space', label: '', w: 1, type: 'spacer' }, { code: 'Key_F1', label: 'F1', w: 1 }, { code: 'Key_F2', label: 'F2', w: 1 }, { code: 'Key_F3', label: 'F3', w: 1 }, { code: 'Key_F4', label: 'F4', w: 1 }, { code: 'Space', label: '', w: 0.5, type: 'spacer' }, { code: 'Key_F5', label: 'F5', w: 1 }, { code: 'Key_F6', label: 'F6', w: 1 }, { code: 'Key_F7', label: 'F7', w: 1 }, { code: 'Key_F8', label: 'F8', w: 1 }, { code: 'Space', label: '', w: 0.5, type: 'spacer' }, { code: 'Key_F9', label: 'F9', w: 1 }, { code: 'Key_F10', label: 'F10', w: 1 }, { code: 'Key_F11', label: 'F11', w: 1 }, { code: 'Key_F12', label: 'F12', w: 1 }],
+            [{ code: 'Key_Grave', label: '`', w: 1 }, { code: 'Key_1', label: '1', w: 1 }, { code: 'Key_2', label: '2', w: 1 }, { code: 'Key_3', label: '3', w: 1 }, { code: 'Key_4', label: '4', w: 1 }, { code: 'Key_5', label: '5', w: 1 }, { code: 'Key_6', label: '6', w: 1 }, { code: 'Key_7', label: '7', w: 1 }, { code: 'Key_8', label: '8', w: 1 }, { code: 'Key_9', label: '9', w: 1 }, { code: 'Key_0', label: '0', w: 1 }, { code: 'Key_Minus', label: '-', w: 1 }, { code: 'Key_Equals', label: '=', w: 1 }, { code: 'Key_Backspace', label: '⌫', w: 2 }],
+            [{ code: 'Key_Tab', label: 'TAB', w: 1.5 }, { code: 'Key_Q', label: 'Q', w: 1 }, { code: 'Key_W', label: 'W', w: 1 }, { code: 'Key_E', label: 'E', w: 1 }, { code: 'Key_R', label: 'R', w: 1 }, { code: 'Key_T', label: 'T', w: 1 }, { code: 'Key_Y', label: 'Y', w: 1 }, { code: 'Key_U', label: 'U', w: 1 }, { code: 'Key_I', label: 'I', w: 1 }, { code: 'Key_O', label: 'O', w: 1 }, { code: 'Key_P', label: 'P', w: 1 }, { code: 'Key_LBracket', label: '[', w: 1 }, { code: 'Key_RBracket', label: ']', w: 1 }, { code: 'Key_Backslash', label: '\\', w: 1.5 }],
+            [{ code: 'Key_CapsLock', label: 'CAPS', w: 1.75 }, { code: 'Key_A', label: 'A', w: 1 }, { code: 'Key_S', label: 'S', w: 1 }, { code: 'Key_D', label: 'D', w: 1 }, { code: 'Key_F', label: 'F', w: 1 }, { code: 'Key_G', label: 'G', w: 1 }, { code: 'Key_H', label: 'H', w: 1 }, { code: 'Key_J', label: 'J', w: 1 }, { code: 'Key_K', label: 'K', w: 1 }, { code: 'Key_L', label: 'L', w: 1 }, { code: 'Key_SemiColon', label: ';', w: 1 }, { code: 'Key_Apostrophe', label: "'", w: 1 }, { code: 'Key_Enter', label: 'ENTER', w: 2.25 }],
+            [{ code: 'Key_LeftShift', label: 'SHIFT', w: 2.25 }, { code: 'Key_Z', label: 'Z', w: 1 }, { code: 'Key_X', label: 'X', w: 1 }, { code: 'Key_C', label: 'C', w: 1 }, { code: 'Key_V', label: 'V', w: 1 }, { code: 'Key_B', label: 'B', w: 1 }, { code: 'Key_N', label: 'N', w: 1 }, { code: 'Key_M', label: 'M', w: 1 }, { code: 'Key_Comma', label: ',', w: 1 }, { code: 'Key_Period', label: '.', w: 1 }, { code: 'Key_Slash', label: '/', w: 1 }, { code: 'Key_RightShift', label: 'SHIFT', w: 2.75 }],
+            [{ code: 'Key_LeftControl', label: 'CTRL', w: 1.25 }, { code: 'Key_LeftWindows', label: 'WIN', w: 1.25 }, { code: 'Key_LeftAlt', label: 'ALT', w: 1.25 }, { code: 'Key_Space', label: 'SPACE', w: 6.25 }, { code: 'Key_RightAlt', label: 'ALT', w: 1.25 }, { code: 'Key_RightWindows', label: 'WIN', w: 1.25 }, { code: 'Key_RightControl', label: 'CTRL', w: 1.25 }]
+        ];
+
+        // --- Components ---
+
+        const KeyboardKey = ({ def, bindings, isActive, onClick, onHover }) => {
+            if (def.type === 'spacer') return <div style={{ width: `${def.w * 60}px` }} className="h-12" />;
+
+            const keyBindings = bindings.filter(b =>
+                (b.primary?.device === 'Keyboard' && b.primary?.key === def.code) ||
+                (b.secondary?.device === 'Keyboard' && b.secondary?.key === def.code)
+            );
+            const hasBinding = keyBindings.length > 0;
+
+            return (
+                <div
+                    onClick={() => hasBinding && onClick(def.code)}
+                    onMouseEnter={() => hasBinding && onHover(def.code)}
+                    onMouseLeave={() => onHover(null)}
+                    style={{ width: `${def.w * 60}px` }}
+                    className={`${styles.key} ${isActive ? styles.keyActive : (hasBinding ? 'bg-[#ff7100]/20' : styles.keyEmpty)}`}
+                    title={keyBindings.map(b => formatActionName(b.action)).join(', ')}
+                >
+                    {def.label}
+                    {hasBinding && <div className="absolute top-0 right-1 text-[8px] text-[#ff7100]">•</div>}
+                </div>
+            );
+        };
+
+        const BindingList = ({ binds, filterKey, searchTerm, editMode, onEdit }) => {
+            const filteredBinds = useMemo(() => {
+                return binds.filter(b => {
+                    const nameMatch = b.action.toLowerCase().includes(searchTerm.toLowerCase());
+                    let keyMatch = true;
+                    if (filterKey) {
+                        keyMatch = (b.primary?.device === 'Keyboard' && b.primary?.key === filterKey) ||
+                                   (b.secondary?.device === 'Keyboard' && b.secondary?.key === filterKey);
+                    }
+                    return nameMatch && keyMatch;
+                });
+            }, [binds, searchTerm, filterKey]);
+
+            return (
+                <div className="flex flex-col h-full overflow-hidden">
+                    <div className="overflow-y-auto h-full pr-2 space-y-1 custom-scrollbar">
+                        {filteredBinds.length === 0 ? (
+                            <div className="text-center p-4 text-gray-500 italic">No bindings found.</div>
+                        ) : (
+                            filteredBinds.map((b, idx) => (
+                                <div
+                                    key={idx}
+                                    onClick={() => editMode && onEdit(b)}
+                                    className={`flex items-center justify-between bg-[#ff7100]/10 p-2 border-l-2 border-[#ff7100] transition-colors ${editMode ? 'cursor-pointer hover:bg-[#ff7100]/40' : 'hover:bg-[#ff7100]/20'}`}
+                                >
+                                    <span className="text-sm font-semibold truncate w-1/3" title={b.action}>
+                                        {formatActionName(b.action)}
+                                    </span>
+                                    <div className="flex flex-col w-2/3 gap-1">
+                                        {/* Primary */}
+                                        {b.primary && (
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-gray-400">PRI:</span>
+                                                <span className={`${b.primary.device === 'Keyboard' ? 'text-[#ff7100]' : 'text-cyan-400'}`}>
+                                                    {b.primary.device === 'Keyboard' ? b.primary.key.replace('Key_', '') : `${b.primary.device} (${b.primary.key.replace('Joy_', '')})`}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {/* Secondary */}
+                                        {b.secondary && (
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-gray-400">SEC:</span>
+                                                <span className={`${b.secondary.device === 'Keyboard' ? 'text-[#ff7100]' : 'text-cyan-400'}`}>
+                                                    {b.secondary.device === 'Keyboard' ? b.secondary.key.replace('Key_', '') : `${b.secondary.device} (${b.secondary.key.replace('Joy_', '')})`}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {/* Axis */}
+                                        {b.axis && (
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="text-gray-400">AXIS:</span>
+                                                <span className="text-cyan-400">
+                                                    {b.axis.device} ({b.axis.key.replace('Joy_', '')})
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {editMode && <Edit2 size={12} className="text-[#ff7100] ml-2" />}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const DeviceBinds = ({ binds }) => {
+            const deviceBinds = binds.filter(b =>
+                (b.primary && b.primary.device !== 'Keyboard' && b.primary.device !== 'Mouse') ||
+                (b.secondary && b.secondary.device !== 'Keyboard' && b.secondary.device !== 'Mouse') ||
+                (b.axis && b.axis.device !== 'Keyboard')
+            );
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 overflow-y-auto max-h-60 custom-scrollbar pr-2">
+                    {deviceBinds.map((b, idx) => {
+                        const deviceName = b.primary?.device || b.axis?.device || b.secondary?.device;
+                        if (!deviceName) return null;
+                        const isX52 = deviceName.includes('X52');
+                        return (
+                            <div key={idx} className={`p-2 border border-[#ff7100]/30 rounded flex flex-col ${isX52 ? 'bg-[#ff7100]/5' : 'bg-gray-900'}`}>
+                                <div className="text-xs font-bold text-[#ff7100] mb-1">{formatActionName(b.action)}</div>
+                                <div className="text-xs text-cyan-400 truncate">
+                                {b.axis ? `Axis: ${b.axis.key.replace('Joy_', '')}` :
+                                    (b.primary && b.primary.device !== 'Keyboard') ? `${b.primary.key.replace('Joy_', '')}` :
+                                    (b.secondary && b.secondary.device !== 'Keyboard') ? `${b.secondary.key.replace('Joy_', '')}` : ''}
+                                </div>
+                            </div>
+                        )
+                    })}
+                    {binds.length > 0 && deviceBinds.length === 0 && (
+                        <div className="text-gray-500 text-sm text-center py-8 col-span-full">No Joystick/Device bindings detected (Keyboard only).</div>
+                    )}
+                </div>
+            );
+        };
+
+        const RemapModal = ({ binding, onClose, onRemap }) => {
+            useEffect(() => {
+                const handleKeyDown = (e) => {
+                    e.preventDefault();
+                    if(e.key === 'Escape') onClose();
+                    else {
+                         const eliteKey = mapToEliteKey(e.code);
+                         onRemap(binding.action, eliteKey);
+                    }
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [binding, onClose, onRemap]);
+
+            return (
+                <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+                    <div className="bg-[#0a0a0a] border-2 border-[#ff7100] p-8 max-w-md w-full relative shadow-[0_0_50px_rgba(255,113,0,0.5)]">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-[#ff7100] hover:text-white"><X /></button>
+                        <h3 className="text-xl font-bold mb-6 text-center uppercase tracking-widest text-[#ff7100] border-b border-[#ff7100]/30 pb-4">
+                            Remap Control
+                        </h3>
+                        <div className="text-center space-y-4">
+                            <p className="text-gray-400 text-sm uppercase">Function</p>
+                            <p className="text-2xl font-bold text-white">{formatActionName(binding.action)}</p>
+
+                            <div className="py-8 my-4 border border-[#ff7100]/30 bg-[#ff7100]/10 rounded animate-pulse">
+                                <p className="text-[#ff7100] font-bold text-lg">PRESS ANY KEY...</p>
+                            </div>
+
+                            <p className="text-xs text-gray-500 mt-4">Press ESC to Cancel</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App Component ---
+
+        const EliteKeybinds = () => {
+            const [binds, setBinds] = useState([]);
+            const [hoveredKey, setHoveredKey] = useState(null);
+            const [selectedKey, setSelectedKey] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [preset, setPreset] = useState('Default');
+            const [fileName, setFileName] = useState('Default Keybinds');
+            const [error, setError] = useState(null);
+            const [editMode, setEditMode] = useState(false);
+            const [remappingBind, setRemappingBind] = useState(null);
+
+            // Load from Local Storage or Default JSON on Mount
+            useEffect(() => {
+                const savedBinds = localStorage.getItem('elite_binds_data');
+                const savedName = localStorage.getItem('elite_binds_filename');
+
+                if (savedBinds) {
+                    try {
+                        const parsed = JSON.parse(savedBinds);
+                        setBinds(parsed);
+                        setFileName(savedName || 'Restored from Storage');
+                        setPreset('Custom');
+                        return; // Successfully loaded from storage, skip fetch
+                    } catch (e) {
+                        console.error("Failed to load from local storage", e);
+                        localStorage.removeItem('elite_binds_data');
+                    }
+                }
+
+                // Fallback to default
+                fetch('./active_bindings.json')
+                    .then(response => {
+                        if (!response.ok) throw new Error('Could not load default bindings');
+                        return response.json();
+                    })
+                    .then(data => {
+                        setBinds(data);
+                        setFileName('Loaded: active_bindings.json');
+                        setPreset('Default');
+                    })
+                    .catch(err => console.log('No default JSON found or CORS error.', err));
+            }, []);
+
+            // Auto-Save to Local Storage
+            useEffect(() => {
+                if (binds.length > 0 && preset === 'Custom') {
+                    localStorage.setItem('elite_binds_data', JSON.stringify(binds));
+                    localStorage.setItem('elite_binds_filename', fileName);
+                }
+            }, [binds, preset, fileName]);
+
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const parsedBinds = parseXMLBinds(e.target.result);
+                            setBinds(parsedBinds);
+                            setFileName(file.name);
+                            setPreset('Custom');
+                            setError(null);
+                            // Explicit save triggered by useEffect
+                        } catch (err) {
+                            setError("Failed to parse keybinds file.");
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+
+            const handleRemap = (actionName, newKey) => {
+                setBinds(prev => {
+                    const newBinds = prev.map(b => {
+                        if (b.action === actionName) {
+                            return {
+                                ...b,
+                                primary: { device: 'Keyboard', key: newKey }
+                            };
+                        }
+                        return b;
+                    });
+                    return newBinds;
+                });
+                setPreset('Custom'); // Force custom preset to trigger save
+                setRemappingBind(null);
+            };
+
+            const handleDownload = () => {
+                const xmlContent = generateXML(binds);
+                const blob = new Blob([xmlContent], { type: 'application/xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Custom.4.2.binds'; // Standard elite filename
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            return (
+                <div className={styles.container}>
+                    <div className={styles.scanline} />
+
+                    {remappingBind && (
+                        <RemapModal
+                            binding={remappingBind}
+                            onClose={() => setRemappingBind(null)}
+                            onRemap={handleRemap}
+                        />
+                    )}
+
+                    <header className={styles.header}>
+                        <div className={styles.title}>
+                            <Rocket className="text-[#ff7100]" />
+                            <span>COCKPIT CONTROLS <span className="text-xs opacity-50 ml-2">SYS.VER.4.2</span></span>
+                        </div>
+
+                        <div className="flex gap-4 items-center">
+                            {error && <div className="text-red-500 text-xs font-bold animate-pulse">{error}</div>}
+
+                            {/* Preset Selector */}
+                            <div className="relative">
+                                <select
+                                    value={preset}
+                                    onChange={(e) => {
+                                        setPreset(e.target.value);
+                                        if(e.target.value === 'Default') {
+                                            fetch('./active_bindings.json')
+                                                .then(res => res.json())
+                                                .then(data => { setBinds(data); setFileName('Loaded: active_bindings.json'); })
+                                                .catch(() => setBinds([]));
+                                        }
+                                    }}
+                                    className="appearance-none bg-black border border-[#ff7100] text-[#ff7100] py-1 px-3 pr-8 rounded-sm focus:outline-none uppercase text-sm font-bold hover:bg-[#ff7100] hover:text-black transition-colors cursor-pointer"
+                                >
+                                    <option value="Default">Default Profile</option>
+                                    <option value="Custom" disabled={binds.length === 0}>Custom Upload</option>
+                                </select>
+                                <ChevronDown className="absolute right-2 top-1.5 w-4 h-4 pointer-events-none text-[#ff7100]" />
+                            </div>
+
+                            {/* Edit Toggle */}
+                            <button
+                                onClick={() => setEditMode(!editMode)}
+                                className={`flex items-center gap-2 px-4 py-1.5 rounded-sm font-bold text-sm uppercase transition-colors border border-[#ff7100] ${editMode ? 'bg-[#ff7100] text-black shadow-[0_0_10px_#ff7100]' : 'text-[#ff7100] hover:bg-[#ff7100]/20'}`}
+                            >
+                                <Edit2 size={16} />
+                                <span>{editMode ? 'Editing Active' : 'Edit Mode'}</span>
+                            </button>
+
+                            {/* Download Button */}
+                            <button
+                                onClick={handleDownload}
+                                disabled={binds.length === 0}
+                                className="flex items-center gap-2 bg-[#ff7100]/20 text-[#ff7100] border border-[#ff7100] px-4 py-1.5 rounded-sm font-bold text-sm uppercase hover:bg-[#ff7100] hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Download size={16} />
+                                <span>Export</span>
+                            </button>
+
+                            {/* Upload Button */}
+                            <label className="flex items-center gap-2 bg-[#ff7100] text-black px-4 py-1.5 rounded-sm font-bold text-sm uppercase cursor-pointer hover:bg-white transition-colors">
+                                <Upload size={16} />
+                                <span>Load</span>
+                                <input type="file" accept=".binds,.xml" className="hidden" onChange={handleFileUpload} />
+                            </label>
+                        </div>
+                    </header>
+
+                    <main className="p-6 max-w-[1600px] mx-auto grid grid-cols-12 gap-6 relative z-10">
+                        {/* Left Column: Visualizer */}
+                        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+                            <div className={styles.panel}>
+                                <div className={styles.panelHeader}>
+                                    <div className="flex items-center gap-2"><KeyboardIcon size={16}/> Keyboard Matrix</div>
+                                    <div className="text-[10px] tracking-widest opacity-80">{fileName}</div>
+                                </div>
+                                <div className="p-8 flex flex-col gap-2 items-center bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+                                    {KEYBOARD_LAYOUT.map((row, i) => (
+                                        <div key={i} className="flex gap-1.5">
+                                            {row.map((keyDef, j) => (
+                                                <KeyboardKey
+                                                    key={j}
+                                                    def={keyDef}
+                                                    bindings={binds}
+                                                    isActive={hoveredKey === keyDef.code || selectedKey === keyDef.code}
+                                                    onClick={(code) => setSelectedKey(code === selectedKey ? null : code)}
+                                                    onHover={setHoveredKey}
+                                                />
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="bg-black/50 p-2 border-t border-[#ff7100]/30 min-h-[40px] flex items-center justify-center">
+                                    {hoveredKey ? (
+                                        <div className="text-[#ff7100] text-sm uppercase font-bold tracking-wider animate-pulse">
+                                            {binds.filter(b => (b.primary?.key === hoveredKey || b.secondary?.key === hoveredKey))
+                                                .map(b => formatActionName(b.action))
+                                                .join('  //  ') || 'NO FUNCTION ASSIGNED'}
+                                        </div>
+                                    ) : (
+                                        <div className="text-gray-600 text-xs uppercase tracking-widest">Hover key to identify // Click to lock filter</div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={styles.panel}>
+                                <div className={styles.panelHeader}>
+                                    <div className="flex items-center gap-2"><Gamepad size={16}/> HOTAS / Device Bindings</div>
+                                    <div className="text-[10px]">X52 / GAMEPAD / JOYSTICK</div>
+                                </div>
+                                <div className="p-4 bg-black/80">
+                                    <DeviceBinds binds={binds} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Binding List */}
+                        <div className="col-span-12 lg:col-span-4 h-[calc(100vh-140px)] sticky top-24">
+                            <div className={`${styles.panel} h-full flex flex-col`}>
+                                <div className={styles.panelHeader}>
+                                    <div className="flex items-center gap-2"><FileText size={16}/> Assigned Modules</div>
+                                    <div className="text-[10px]">{binds.length} ACTIVE</div>
+                                </div>
+                                <div className="p-2 border-b border-[#ff7100]/30 bg-black/40 flex flex-col gap-2">
+                                    <div className="relative">
+                                        <Search className="absolute left-2 top-2 text-[#ff7100] opacity-50" size={16} />
+                                        <input
+                                            type="text"
+                                            placeholder="SEARCH SYSTEMS..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full bg-black/50 border border-[#ff7100]/30 rounded pl-8 pr-2 py-1 text-sm text-[#ff7100] focus:outline-none focus:border-[#ff7100] placeholder-gray-700 uppercase"
+                                        />
+                                    </div>
+                                    {selectedKey && (
+                                        <div className="flex items-center justify-between bg-[#ff7100] text-black px-2 py-1 text-xs font-bold rounded-sm">
+                                            <span>FILTER: {selectedKey.replace('Key_', '')}</span>
+                                            <button onClick={() => setSelectedKey(null)} className="hover:text-white">✕</button>
+                                        </div>
+                                    )}
+                                    {editMode && (
+                                        <div className="text-center text-xs text-[#ff7100] animate-pulse font-bold bg-[#ff7100]/10 p-1 rounded">
+                                            SELECT A ROW BELOW TO REMAP
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 overflow-hidden p-2 bg-black/80">
+                                    <BindingList
+                                        binds={binds}
+                                        filterKey={selectedKey}
+                                        searchTerm={searchTerm}
+                                        editMode={editMode}
+                                        onEdit={setRemappingBind}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+
+                    <footer className="fixed bottom-0 w-full bg-black border-t border-[#ff7100]/30 p-1 text-[10px] text-gray-500 text-center uppercase tracking-widest z-50">
+                        Elite Dangerous Keybind Visualizer // React App // Parses Standard Frontier .binds format
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<EliteKeybinds />);
+    </script>
+</body>
+</html>

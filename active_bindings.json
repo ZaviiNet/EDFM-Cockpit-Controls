@@ -1,0 +1,405 @@
+[
+  {
+    "action": "YawAxisRaw",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_RZAxis" }
+  },
+  {
+    "action": "RollAxisRaw",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_XAxis" }
+  },
+  {
+    "action": "PitchAxisRaw",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_YAxis" }
+  },
+  {
+    "action": "LeftThrustButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_27" }
+  },
+  {
+    "action": "RightThrustButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_25" }
+  },
+  {
+    "action": "UpThrustButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_24" }
+  },
+  {
+    "action": "DownThrustButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_26" }
+  },
+  {
+    "action": "ThrottleAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_ZAxis" }
+  },
+  {
+    "action": "ToggleReverseThrottleInput",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_7" }
+  },
+  {
+    "action": "SetSpeedZero",
+    "primary": { "device": "Keyboard", "key": "Key_DownArrow" }
+  },
+  {
+    "action": "SetSpeed25",
+    "primary": { "device": "Keyboard", "key": "Key_UpArrow" }
+  },
+  {
+    "action": "SetSpeed50",
+    "primary": { "device": "Keyboard", "key": "Key_LeftArrow" }
+  },
+  {
+    "action": "SetSpeed75",
+    "primary": { "device": "Keyboard", "key": "Key_RightArrow" }
+  },
+  {
+    "action": "SetSpeed100",
+    "primary": { "device": "Keyboard", "key": "Key_Numpad_4" }
+  },
+  {
+    "action": "ToggleFlightAssist",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_8" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_Subtract" }
+  },
+  {
+    "action": "UseBoostJuice",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_31" }
+  },
+  {
+    "action": "HyperSuperCombination",
+    "primary": { "device": "Keyboard", "key": "Key_J" },
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_11" }
+  },
+  {
+    "action": "OrbitLinesToggle",
+    "primary": { "device": "Keyboard", "key": "Key_Equals" }
+  },
+  {
+    "action": "SelectTarget",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_4" }
+  },
+  {
+    "action": "CycleNextTarget",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_21" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_3" }
+  },
+  {
+    "action": "CyclePreviousTarget",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_23" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_6" }
+  },
+  {
+    "action": "SelectHighestThreat",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_33" }
+  },
+  {
+    "action": "CycleNextHostileTarget",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_20" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_Multiply" }
+  },
+  {
+    "action": "CyclePreviousHostileTarget",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_22" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_Divide" }
+  },
+  {
+    "action": "PrimaryFire",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_1" },
+    "secondary": { "device": "Keyboard", "key": "Key_Numpad_9" }
+  },
+  {
+    "action": "SecondaryFire",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_5" }
+  },
+  {
+    "action": "DeployHardpointToggle",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_2" }
+  },
+  {
+    "action": "ToggleButtonUpInput",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_13" }
+  },
+  {
+    "action": "DeployHeatSink",
+    "primary": { "device": "Keyboard", "key": "Key_H" }
+  },
+  {
+    "action": "ShipSpotLightToggle",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_14" }
+  },
+  {
+    "action": "RadarRangeAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_UAxis" }
+  },
+  {
+    "action": "IncreaseEnginesPower",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Up" }
+  },
+  {
+    "action": "IncreaseWeaponsPower",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Right" }
+  },
+  {
+    "action": "IncreaseSystemsPower",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Left" }
+  },
+  {
+    "action": "ResetPowerDistribution",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Down" }
+  },
+  {
+    "action": "HMDReset",
+    "primary": { "device": "Keyboard", "key": "Key_F12" }
+  },
+  {
+    "action": "ToggleCargoScoop",
+    "primary": { "device": "Keyboard", "key": "Key_Home" },
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_12" }
+  },
+  {
+    "action": "LandingGearToggle",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_10" },
+    "secondary": { "device": "Keyboard", "key": "Key_L" }
+  },
+  {
+    "action": "UseShieldCell",
+    "primary": { "device": "Keyboard", "key": "Key_Space" }
+  },
+  {
+    "action": "FireChaffLauncher",
+    "primary": { "device": "Keyboard", "key": "Key_G" }
+  },
+  {
+    "action": "ChargeECM",
+    "primary": { "device": "Keyboard", "key": "Key_R" }
+  },
+  {
+    "action": "NightVisionToggle",
+    "primary": { "device": "Keyboard", "key": "Key_X" }
+  },
+  {
+    "action": "UIFocus",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_6" }
+  },
+  {
+    "action": "FocusLeftPanel",
+    "primary": { "device": "Keyboard", "key": "Key_1" }
+  },
+  {
+    "action": "FocusCommsPanel",
+    "primary": { "device": "Keyboard", "key": "Key_2" }
+  },
+  {
+    "action": "QuickCommsPanel",
+    "primary": { "device": "Keyboard", "key": "Key_Enter" }
+  },
+  {
+    "action": "FocusRadarPanel",
+    "primary": { "device": "Keyboard", "key": "Key_3" }
+  },
+  {
+    "action": "FocusRightPanel",
+    "primary": { "device": "Keyboard", "key": "Key_4" }
+  },
+  {
+    "action": "GalaxyMapOpen",
+    "primary": { "device": "Keyboard", "key": "Key_G" }
+  },
+  {
+    "action": "SystemMapOpen",
+    "primary": { "device": "Keyboard", "key": "Key_Numpad_2" }
+  },
+  {
+    "action": "Pause",
+    "primary": { "device": "Keyboard", "key": "Key_P" }
+  },
+  {
+    "action": "OpenCodexGoToDiscovery",
+    "primary": { "device": "Keyboard", "key": "Key_O" }
+  },
+  {
+    "action": "PlayerHUDModeToggle",
+    "primary": { "device": "Keyboard", "key": "Key_M" },
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_16" }
+  },
+  {
+    "action": "ExplorationFSSEnter",
+    "primary": { "device": "Keyboard", "key": "Key_Apostrophe" }
+  },
+  {
+    "action": "UI_Up",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Up" },
+    "secondary": { "device": "Keyboard", "key": "Key_U" }
+  },
+  {
+    "action": "UI_Down",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Down" },
+    "secondary": { "device": "Keyboard", "key": "Key_R" }
+  },
+  {
+    "action": "UI_Left",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Left" },
+    "secondary": { "device": "Keyboard", "key": "Key_A" }
+  },
+  {
+    "action": "UI_Right",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Right" },
+    "secondary": { "device": "Keyboard", "key": "Key_T" }
+  },
+  {
+    "action": "UI_Select",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_4" },
+    "secondary": { "device": "Keyboard", "key": "Key_S" }
+  },
+  {
+    "action": "CycleNextPanel",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_21" },
+    "secondary": { "device": "Keyboard", "key": "Key_E" }
+  },
+  {
+    "action": "CyclePreviousPanel",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_23" },
+    "secondary": { "device": "Keyboard", "key": "Key_Q" }
+  },
+  {
+    "action": "CycleNextPage",
+    "primary": { "device": "Keyboard", "key": "Key_C" },
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_25" }
+  },
+  {
+    "action": "CyclePreviousPage",
+    "primary": { "device": "Keyboard", "key": "Key_Z" },
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_27" }
+  },
+  {
+    "action": "HeadLookPitchUp",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Up" }
+  },
+  {
+    "action": "HeadLookPitchDown",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Down" }
+  },
+  {
+    "action": "HeadLookYawLeft",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Left" }
+  },
+  {
+    "action": "HeadLookYawRight",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Right" }
+  },
+  {
+    "action": "CamPitchAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_YAxis" }
+  },
+  {
+    "action": "CamYawAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_RZAxis" }
+  },
+  {
+    "action": "CamTranslateForward",
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_26" }
+  },
+  {
+    "action": "CamTranslateBackward",
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_24" }
+  },
+  {
+    "action": "CamTranslateXAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_XAxis" }
+  },
+  {
+    "action": "CamTranslateLeft",
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_27" }
+  },
+  {
+    "action": "CamTranslateRight",
+    "secondary": { "device": "SaitekX52Pro", "key": "Joy_25" }
+  },
+  {
+    "action": "ToggleDriveAssist",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_19" }
+  },
+  {
+    "action": "SteeringAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_XAxis" }
+  },
+  {
+    "action": "BuggyRollAxisRaw",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_XAxis" }
+  },
+  {
+    "action": "BuggyPitchAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_YAxis" }
+  },
+  {
+    "action": "VerticalThrustersButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_31" }
+  },
+  {
+    "action": "BuggyPrimaryFireButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_1" }
+  },
+  {
+    "action": "BuggySecondaryFireButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_5" }
+  },
+  {
+    "action": "AutoBreakBuggyButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_10" }
+  },
+  {
+    "action": "ToggleBuggyTurretButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_2" }
+  },
+  {
+    "action": "BuggyCycleFireGroupNext",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_9" }
+  },
+  {
+    "action": "SelectTarget_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_4" }
+  },
+  {
+    "action": "BuggyTurretYawLeftButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_27" }
+  },
+  {
+    "action": "BuggyTurretYawRightButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_25" }
+  },
+  {
+    "action": "BuggyTurretPitchUpButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_24" }
+  },
+  {
+    "action": "BuggyTurretPitchDownButton",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_26" }
+  },
+  {
+    "action": "DriveSpeedAxis",
+    "axis": { "device": "SaitekX52Pro", "key": "Joy_ZAxis" }
+  },
+  {
+    "action": "BuggyToggleReverseThrottleInput",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_7" }
+  },
+  {
+    "action": "IncreaseEnginesPower_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Up" }
+  },
+  {
+    "action": "IncreaseWeaponsPower_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Right" }
+  },
+  {
+    "action": "IncreaseSystemsPower_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Left" }
+  },
+  {
+    "action": "ResetPowerDistribution_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_POV1Down" }
+  },
+  {
+    "action": "ToggleCargoScoop_Buggy",
+    "primary": { "device": "SaitekX52Pro", "key": "Joy_14" }
+  }
+]
