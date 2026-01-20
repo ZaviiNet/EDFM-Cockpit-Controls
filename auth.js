@@ -1,8 +1,8 @@
 // Frontier API authentication logic will go here.
 
 const AUTH_API = 'https://auth.frontierstore.net';
-const CLIENT_ID = 'ac9902d8-a677-47f5-a2e5-1a19679e8acc'; //Replace with your own ID
-const CALLBACK_URL = window.location.origin;
+const CLIENT_ID = 'ac9902d8-a677-47f5-a2e5-1a19679e8acc'; // User-provided Client ID
+const CALLBACK_URL = 'https://cockpitcontrols.edfm.space';
 
 // Generate a random string for the code verifier
 function generateCodeVerifier() {
@@ -80,6 +80,7 @@ async function handleAuthCallback() {
 
                 // Remove the code from the URL
                 window.history.replaceState({}, document.title, window.location.pathname);
+                return data.access_token;
             } else {
                 console.error('Failed to exchange authorization code for token:', await response.text());
             }
@@ -87,6 +88,7 @@ async function handleAuthCallback() {
             console.error('Error during token exchange:', error);
         }
     }
+    return null;
 }
 
 async function fetchUserDetails(accessToken) {
@@ -100,14 +102,12 @@ async function fetchUserDetails(accessToken) {
         if (response.ok) {
             const user = await response.json();
             console.log('User details:', user);
-            // You can now use the user details in your application
+            return user;
         } else {
             console.error('Failed to fetch user details:', await response.text());
         }
     } catch (error) {
         console.error('Error fetching user details:', error);
     }
+    return null;
 }
-
-// Handle the auth callback when the page loads
-handleAuthCallback();
