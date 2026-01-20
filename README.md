@@ -16,6 +16,8 @@ Live Demo
 
 * **Local Storage: Automatically saves your changes so you can come back later.**
 
+* **Frontier API Authentication: Login with your Frontier account to save your keybinds to our servers.**
+
 ## 🛠️ How to use
 
 **Open the website. [here](https://cockpitcontrols.edfm.space)**

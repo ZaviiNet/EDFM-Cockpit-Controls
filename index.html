@@ -18,6 +18,9 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
+    <!-- Custom Auth Script -->
+    <script src="auth.js"></script>
+
     <style>
         body {
             font-family: 'JetBrains Mono', monospace;
@@ -65,6 +68,7 @@
         const Edit2 = (props) => <Icon {...props}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></Icon>;
         const X = (props) => <Icon {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></Icon>;
         const Save = (props) => <Icon {...props}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></Icon>;
+        const User = (props) => <Icon {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></Icon>;
 
         // --- Styles ---
         const styles = {
@@ -339,9 +343,24 @@
             const [error, setError] = useState(null);
             const [editMode, setEditMode] = useState(false);
             const [remappingBind, setRemappingBind] = useState(null);
+            const [user, setUser] = useState(null);
+            const [accessToken, setAccessToken] = useState(null);
 
-            // Load from Local Storage or Default JSON on Mount
+            // Handle Auth and Load Binds
             useEffect(() => {
+                const handleAuth = async () => {
+                    const token = await handleAuthCallback();
+                    if (token) {
+                        setAccessToken(token);
+                        const userDetails = await fetchUserDetails(token);
+                        if (userDetails) {
+                            setUser(userDetails);
+                        }
+                    }
+                };
+
+                handleAuth();
+
                 const savedBinds = localStorage.getItem('elite_binds_data');
                 const savedName = localStorage.getItem('elite_binds_filename');
 
@@ -351,14 +370,13 @@
                         setBinds(parsed);
                         setFileName(savedName || 'Restored from Storage');
                         setPreset('Custom');
-                        return; // Successfully loaded from storage, skip fetch
+                        return;
                     } catch (e) {
                         console.error("Failed to load from local storage", e);
                         localStorage.removeItem('elite_binds_data');
                     }
                 }
 
-                // Fallback to default
                 fetch('./active_bindings.json')
                     .then(response => {
                         if (!response.ok) throw new Error('Could not load default bindings');
@@ -391,7 +409,6 @@
                             setFileName(file.name);
                             setPreset('Custom');
                             setError(null);
-                            // Explicit save triggered by useEffect
                         } catch (err) {
                             setError("Failed to parse keybinds file.");
                         }
@@ -413,7 +430,7 @@
                     });
                     return newBinds;
                 });
-                setPreset('Custom'); // Force custom preset to trigger save
+                setPreset('Custom');
                 setRemappingBind(null);
             };
 
@@ -423,7 +440,7 @@
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'Custom.4.2.binds'; // Standard elite filename
+                a.download = 'Custom.4.2.binds';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -451,7 +468,6 @@
                         <div className="flex gap-4 items-center">
                             {error && <div className="text-red-500 text-xs font-bold animate-pulse">{error}</div>}
 
-                            {/* Preset Selector */}
                             <div className="relative">
                                 <select
                                     value={preset}
@@ -472,7 +488,6 @@
                                 <ChevronDown className="absolute right-2 top-1.5 w-4 h-4 pointer-events-none text-[#ff7100]" />
                             </div>
 
-                            {/* Edit Toggle */}
                             <button
                                 onClick={() => setEditMode(!editMode)}
                                 className={`flex items-center gap-2 px-4 py-1.5 rounded-sm font-bold text-sm uppercase transition-colors border border-[#ff7100] ${editMode ? 'bg-[#ff7100] text-black shadow-[0_0_10px_#ff7100]' : 'text-[#ff7100] hover:bg-[#ff7100]/20'}`}
@@ -481,7 +496,6 @@
                                 <span>{editMode ? 'Editing Active' : 'Edit Mode'}</span>
                             </button>
 
-                            {/* Download Button */}
                             <button
                                 onClick={handleDownload}
                                 disabled={binds.length === 0}
@@ -491,12 +505,26 @@
                                 <span>Export</span>
                             </button>
 
-                            {/* Upload Button */}
                             <label className="flex items-center gap-2 bg-[#ff7100] text-black px-4 py-1.5 rounded-sm font-bold text-sm uppercase cursor-pointer hover:bg-white transition-colors">
                                 <Upload size={16} />
                                 <span>Load</span>
                                 <input type="file" accept=".binds,.xml" className="hidden" onChange={handleFileUpload} />
                             </label>
+
+                            {user ? (
+                                <div className="flex items-center gap-2 text-white">
+                                    <User size={16} />
+                                    <span>{user.firstname} {user.lastname}</span>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={loginWithFrontier}
+                                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-1.5 rounded-sm font-bold text-sm uppercase hover:bg-blue-700 transition-colors"
+                                >
+                                    <User size={16} />
+                                    <span>Login with Frontier</span>
+                                </button>
+                            )}
                         </div>
                     </header>
 
