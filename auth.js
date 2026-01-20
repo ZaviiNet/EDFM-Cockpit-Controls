@@ -1,7 +1,7 @@
 // Frontier API authentication logic will go here.
 
 const AUTH_API = 'https://auth.frontierstore.net';
-const CLIENT_ID = 'ac9902d8-a677-47f5-a2e5-1a19679e8acc'; // User-provided Client ID
+const CLIENT_ID = 'tbd0ddee3-eba2-48ac-8425-10ccf1dba92d'; // User-provided Client ID
 const CALLBACK_URL = 'https://cockpitcontrols.edfm.space';
 
 // Generate a random string for the code verifier
